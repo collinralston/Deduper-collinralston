@@ -1,0 +1,9 @@
+- 10/8/26
+	- I began my pseudocode work, was able to write out the majority of my psuedocode.
+	- Planning on writing my test SAM files tomorrow.
+- 10/9/26
+	- SAM test files are written - going to think about more test cases over the weekend
+- 10/10/26
+	- In my pseudocode, I added some mini test cases for each of the functions
+- 10/11/26
+	- Double-checked my work, planning on pushing to github.

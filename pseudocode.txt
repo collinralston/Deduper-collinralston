@@ -1,0 +1,91 @@
+Goals of this assignment:
+	Define the problem
+	Write examples:
+	Include a properly formatted input sam file (an example sam file is included in the repo for your reference)
+	Include a properly formatted expected output sam file
+	Cover several different cases of things that are and are not PCR duplicates
+	It may be helpful to create a "unit test folder" that contains its own readme.md describing the test cases in your unit test sam file
+	Develop your algorithm using pseudocode
+	Determine high level functions
+	Description
+	Function headers
+	Test examples (for individual functions)
+	Return statement
+Goals of the Algorithm:
+	Given a SAM file of uniquely mapped reads, remove all PCR
+	duplicates (retain only a single copy of each read)
+	• Samtools sort
+	• Adjust for soft clipping
+	• Single-end reads
+	• Known UMIs
+	• Considerations:
+	• Millions of reads – avoid loading everything into memory!
+	• Be sure to utilize functions appropriately
+	• Appropriately comment code and include doc strings
+
+Initial Thinking:
+	problem: I need to remove all PCR duplicates from a SAM file, keeping the first occurence of the read in the file.
+		cases to account for:
+			Soft Clipping: If there are sequencing errors at the tail ends of a PCR duplicate, based on 5' start position, it will appear
+			that it is not a PCR duplicate, but in fact, it is. Therefore, I need to account for this by looking at the cigar string.
+			Variables needed to pull to determine alignment position:
+				RNAME (chomosome)
+				POS (soft start pos)
+				CIGAR (for potential soft clipping)
+				FLAG (for strandedness) - actually don't need to worry about this b/c they are not paired-end reads
+Pseudocode:
+open input sam file
+open output sam file
+For line in SAM file: #loop for "test read"
+	If already declared as a PCR duplicate:
+		move on to the next read
+	Else:
+		extract the length of the read #this will be important later on so that the algorithm does not do an all vs all comparison
+	For line in SAM file: # loop for "looking for matches"
+		If the TRUE starting position is > length of test read downstream, don't bother to check the rest
+			break
+		If TRUE start positions are eqaul (taking into acct RNAME,POS,CIGAR,FLAG)
+			Check to see if the UMIs are identical
+				If true:
+					Have an int variable mark that line as a PCR duplicate
+				If false:
+					continue on to the next read
+For line in SAM file that didn't get marked as PCR duplicate:
+	print to output file.
+
+Functions that I will need to create:
+	True starting position - this may be the hardest to do.
+		Something like this
+		RNAME variable
+		POS variable
+		CIGAR variable
+		If CIGAR string has a soft clip on the left side -> starting pos = POS - CIGAR
+			regex for (number) S (number) M
+		example input:
+		RNAME: 1
+		POS: 10
+		CIGAR: 2S10M
+		BIT: 0
+		example output:
+		actual stating position 8
+	A function to find the length of the sequence:
+		straightforwardish - isolate the seq column, count the length of the string
+		example input:
+		length = 150
+		POS = 10
+		ending position = 160
+	A function to isolate all of the desired variables in each sam line (RNAME, POS, FLAG, CIGAR, etc...)
+		.split()
+		example input:
+		NS500451:154:HWKTMBGXX:1:11101:6251:1098:ATCCATGG 	 0       	 2           	 100000001	 36  	 71M  	 *    	 0    	 0   	 GGCGTTCCAAACCACGGTCATCTCTTCTTTGCTTACTTTAGTGACTTCTGGAGGATCAGGGCGGCCAGGTC	 /<EEAEEEEEEEEAEEEEEEEEEEAEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+		example output:
+		UMI: ATCCATGG
+		BIT: 0
+		RNAME: 2
+		CIGAR: 71M
+		SEQ: GGCGTTCCAAACCACGGTCATCTCTTCTTTGCTTACTTTAGTGACTTCTGGAGGATCAGGGCGGCCAGGTC
+		
+
+
+			
+		
